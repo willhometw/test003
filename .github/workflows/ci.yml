@@ -18,7 +18,5 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extension-csv: mbstring, intl, curl, dom
           coverage: xdebug #optional
-      - name: Install dependencies
-        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
       - name: Test with phpunit
         run: vendor/bin/phpunit --coverage-text
