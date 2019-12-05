@@ -1,23 +1,66 @@
-name: PHP Composer
+#測試 8
+image: 
+  name: gitlab/gitlab-runner:latest
+  entrypoint: [""]
 
-on: [push]
+stages:
+    - Test
+    - Deploy QA
+    - Deploy Production
+    - Message
 
-jobs:
-  build:
+Test:
+    stage: Test
+    script:
+        - echo "Pass Test"
+    only:
+        - qa
+        - release
+    tags:
+        - qa
+        - release
 
-    runs-on: ubuntu-latest
+Deploy QA:
+    stage: Deploy QA
+    script:
+        - echo "Run Deploy QA"
+        - pwd
+        - cd /datadisk/gitlab-nfs/qa/chat.gvm.com.tw
+        - git checkout qa
+        - git fetch --all
+        - git reset --hard origin/qa
+        - git pull origin qa
+    only:
+        - qa
+    tags:
+        - qa
+    # when: manual
+    environment: test
 
-    steps:
-    - uses: actions/checkout@v1
+Deploy Production:
+    stage: Deploy Production
+    script:
+        - echo "Run Deploy Production"
+        - pwd
+        - cd /datadisk/gitlab-nfs/release/chat.gvm.com.tw
+        - git checkout qa
+        - git fetch --all
+        - git reset --hard origin/qa
+        - git pull origin qa
+    only:
+        - release
+    tags:
+        - release
+    # when: manual
+    environment: Production
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate
-
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
-
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
-
-    # - name: Run test suite
-    #   run: composer run-script test
+Message:
+    stage: Message
+    script:
+        - echo "Message"
+    only:
+        - qa
+        - release
+    tags:
+        - qa
+        - release
